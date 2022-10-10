@@ -1,1 +1,1 @@
-# @wanyne/mysql-client
+# @wnynya/mysql-client

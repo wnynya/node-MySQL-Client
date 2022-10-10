@@ -1,7 +1,7 @@
 {
-  "name": "@wanyne/mysql-client",
-  "version": "0.1.0",
-  "description": "@wanyne/mysql-client",
+  "name": "@wnynya/mysql-client",
+  "version": "0.1.1",
+  "description": "@wnynya/mysql-client",
   "author": "Wany <sung@wany.io> (https://wany.io)",
   "main": "src/index.mjs",
   "license": "MIT",
@@ -10,10 +10,10 @@
     "database",
     "client"
   ],
-  "homepage": "https://github.com/wnynya/wanyne-modules-MySQL-Client#readme",
+  "homepage": "https://github.com/wnynya/node-MySQL-Client#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wnynya/wanyne-modules-MySQL-Client.git"
+    "url": "https://github.com/wnynya/node-MySQL-Client.git"
   },
   "dependencies": {
     "mysql2": "^2.3.3"
