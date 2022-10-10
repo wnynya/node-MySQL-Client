@@ -1,0 +1,21 @@
+{
+  "name": "@wanyne/mysql-client",
+  "version": "0.1.0",
+  "description": "@wanyne/mysql-client",
+  "author": "Wany <sung@wany.io> (https://wany.io)",
+  "main": "src/index.mjs",
+  "license": "MIT",
+  "keywords": [
+    "mysql",
+    "database",
+    "client"
+  ],
+  "homepage": "https://github.com/wnynya/wanyne-modules-MySQL-Client#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wnynya/wanyne-modules-MySQL-Client.git"
+  },
+  "dependencies": {
+    "mysql2": "^2.3.3"
+  }
+}
