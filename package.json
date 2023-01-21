@@ -1,6 +1,6 @@
 {
   "name": "@wnynya/mysql-client",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "@wnynya/mysql-client",
   "author": "Wany <sung@wany.io> (https://wany.io)",
   "main": "src/index.mjs",
@@ -16,7 +16,6 @@
     "url": "https://github.com/wnynya/node-MySQL-Client.git"
   },
   "dependencies": {
-    "datwo": "^0.7.1",
     "mysql2": "^2.3.3"
   }
 }
