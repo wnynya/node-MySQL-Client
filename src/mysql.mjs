@@ -1,4 +1,5 @@
 import mysql from 'mysql2';
+import Datwo from 'datwo';
 
 class DatabaseError extends Error {
   constructor(message) {
@@ -36,6 +37,10 @@ class MySQLClient {
       for (let i = 0; i < values.length; i++) {
         if (values[i] == undefined) {
           throw new DatabaseError('index ' + i + ' of values is undefined');
+        } else if (typeof values[i] == 'object') {
+          values[i] = JSON.stringify(values[i]);
+        } else if (values[i] instanceof Date) {
+          values[i] = new Datwo(values[i]).format('YYYY-MM-DD hh:mm:ss');
         }
       }
     }
