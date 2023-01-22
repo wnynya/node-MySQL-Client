@@ -148,17 +148,21 @@ async function test2() {
 
 function test3() {
   console.log(
-    SQLGen({
-      statement: 'INSERT',
-      table: 'example',
-      exports: {
-        uid: null,
-        hash: null,
-        name: null,
-        email: null,
-        creation: new Date(),
+    SQLGen(
+      {
+        statement: 'INSERT',
+        table: 'example',
+        exports: {
+          uid: 'ppap',
+          hash: 1,
+          name: true,
+          email: 'hello',
+          creation: new Date(),
+          meta: {},
+        },
       },
-    })
+      true
+    )
   );
 }
 
