@@ -1,4 +1,4 @@
-export default class MySQLClass {
+class MySQLClass {
   constructor(mysql) {
     this.mysql = mysql;
   }
@@ -19,6 +19,10 @@ export default class MySQLClass {
       filter: this.filter,
       single: true,
     });
+
+    if (!data) {
+      throw new Error('No Data');
+    }
 
     for (const key in data) {
       this[key] = data[key];
@@ -54,7 +58,11 @@ export default class MySQLClass {
         if (!this.schema.hasOwnProperty(part)) {
           continue;
         }
-        imports[part] = this.schema[part];
+        if (this.schema[part] instanceof Array) {
+          imports[part] = this.schema[part][0];
+        } else {
+          imports[part] = this.schema[part];
+        }
       }
     }
 
@@ -73,7 +81,11 @@ export default class MySQLClass {
         if (!this.schema.hasOwnProperty(part)) {
           continue;
         }
-        exports[part] = this[part];
+        if (this.schema[part] instanceof Array) {
+          exports[part] = this.schema[part][1](this[part]);
+        } else {
+          exports[part] = this[part];
+        }
       }
     }
 
@@ -106,3 +118,6 @@ export default class MySQLClass {
     return json;
   }
 }
+
+export { MySQLClass };
+export default MySQLClass;

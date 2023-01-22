@@ -398,6 +398,7 @@ class MySQLClient {
     }
   }
 }
+export { MySQLClient };
 export default MySQLClient;
 
 const SQLGen = MySQLClient.SQLGen;

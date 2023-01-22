@@ -32,13 +32,14 @@ class Example extends MySQLClass {
       name: 'string',
       creation: 'date',
       meta: (v) => {
-        return new Promise((resolve) => {
+        return new Example(v);
+        /*return new Promise((resolve) => {
           v = JSON.parse(v);
           v.addon = 'message';
           setTimeout(() => {
             resolve(v);
           }, 100);
-        });
+        });*/
       },
     };
     this.filter = { uid: this.uid };

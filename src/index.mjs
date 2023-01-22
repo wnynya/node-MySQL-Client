@@ -1,6 +1,5 @@
-import MySQLClient from './mysql.mjs';
-import { SQLGen } from './mysql.mjs';
-import MySQLClass from './class.mjs';
+import { MySQLClient, SQLGen } from './mysql.mjs';
+import { MySQLClass } from './class.mjs';
 
 export { MySQLClient, SQLGen, MySQLClass };
 
@@ -15,11 +14,11 @@ export default class extends MySQLClient {
     return await defaultClient.query(...args);
   }
 
-  static set(client) {
+  static setDefaultClient(client) {
     defaultClient = client;
   }
 
-  static get() {
+  static getDefaultClient() {
     return defaultClient;
   }
 }
