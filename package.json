@@ -1,6 +1,6 @@
 {
   "name": "@wnynya/mysql-client",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "@wnynya/mysql-client",
   "author": "Wany <sung@wany.io> (https://wany.io)",
   "main": "src/index.mjs",
