@@ -45,7 +45,6 @@ class MySQLClient {
 
   async query(query, values) {
     if (typeof query == 'string') {
-      console.log(query, values);
       if (values) {
         if (!(values instanceof Array)) {
           throw new Error('values must instanceof Array');
@@ -78,62 +77,23 @@ class MySQLClient {
       const result = await this.#pool.promise().execute(query, values);
       return result[0];
     } else if (query instanceof Object) {
-      const st = query?.statement?.toUpperCase();
-      switch (st) {
-        case 'INSERT': {
-          return await this.query(...this.#insertSQL(query));
-        }
-        case 'SELECT': {
-          let res = await this.query(...this.#selectSQL(query));
-          if (!query.count) {
-            const tasks = [];
-            for (let i = 0; i < res.length; i++) {
-              for (const k in res[i]) {
-                tasks.push(
-                  (async () => {
-                    res[i][k] =
-                      query.imports instanceof Array
-                        ? await this.#parseImport(
-                            this.#columnTypes?.[query.table]?.[k],
-                            res[i][k]
-                          )
-                        : await this.#parseImport(query.imports[k], res[i][k]);
-                  })()
-                );
-              }
-            }
-            await Promise.all(tasks);
-          } else {
-            res = res[0][query.countColumn];
-          }
-          return res;
-        }
-        case 'UPDATE': {
-          return await this.query(...this.#updateSQL(query));
-        }
-        case 'DELETE': {
-          return await this.query(...this.#deleteSQL(query));
-        }
-        default: {
-          throw new Error('not support statement (' + st + ')');
-        }
-      }
+      return await this.query(...MySQLClient.SQLGen(query));
     } else {
       throw new Error('unparsable query');
     }
   }
 
-  #insertSQL(query) {
+  static #insertSQL(query) {
     let q = ``;
     let v = [];
 
-    q += `INSERT INTO \`${this.#escape(query.table)}\` (`;
+    q += `INSERT INTO \`${MySQLClient.#escape(query.table)}\` (`;
     const exports = Object.keys(query.exports);
     if (exports.length == 0) {
       throw new Error('no exports');
     }
     for (const [i, c] of exports.entries()) {
-      q += `\`${this.#escape(c)}\``;
+      q += `\`${MySQLClient.#escape(c)}\``;
       if (i < exports.length - 1) {
         q += `, `;
       }
@@ -151,7 +111,7 @@ class MySQLClient {
     return [q, v];
   }
 
-  #selectSQL(query) {
+  static #selectSQL(query) {
     let q = ``;
     let v = [];
 
@@ -166,20 +126,20 @@ class MySQLClient {
     }
     if (!query.count) {
       for (const [i, c] of imports.entries()) {
-        q += `\`${this.#escape(c)}\``;
+        q += `\`${MySQLClient.#escape(c)}\``;
         if (i < imports.length - 1) {
           q += `, `;
         }
       }
     } else {
-      let c = `COUNT(${this.#escape(imports[0])})`;
+      let c = `COUNT(${MySQLClient.#escape(imports[0])})`;
       query.countColumn = c;
       q += c;
     }
 
-    q += ` FROM \`${this.#escape(query.table)}\``;
+    q += ` FROM \`${MySQLClient.#escape(query.table)}\``;
 
-    const where = this.#whereSQL(query);
+    const where = MySQLClient.#whereSQL(query);
     q += where.q;
     v.push(...where.v);
 
@@ -190,7 +150,7 @@ class MySQLClient {
         q += `\`${sort}\``;
       } else if (sort instanceof Array) {
         for (const [i, c] of sort.entries()) {
-          q += `\`${this.#escape(c)}\``;
+          q += `\`${MySQLClient.#escape(c)}\``;
           if (i < sort.length - 1) {
             q += `, `;
           }
@@ -198,7 +158,9 @@ class MySQLClient {
       } else if (sort instanceof Object) {
         const sortCols = Object.keys(sort);
         for (const [i, c] of sortCols.entries()) {
-          q += `\`${this.#escape(c)}\` ${sort[c] == `DESC` ? `DESC` : `ASC`}`;
+          q += `\`${MySQLClient.#escape(c)}\` ${
+            sort[c] == `DESC` ? `DESC` : `ASC`
+          }`;
           if (i < sortCols.length - 1) {
             q += `, `;
           }
@@ -218,41 +180,41 @@ class MySQLClient {
     return [q, v];
   }
 
-  #updateSQL(query) {
+  static #updateSQL(query) {
     let q = ``;
     let v = [];
 
-    q += `UPDATE \`${this.#escape(query.table)}\` SET `;
+    q += `UPDATE \`${MySQLClient.#escape(query.table)}\` SET `;
     const exports = Object.keys(query.exports);
     for (const [i, c] of exports.entries()) {
-      q += `\`${this.#escape(c)}\` = ?`;
+      q += `\`${MySQLClient.#escape(c)}\` = ?`;
       v.push(query.exports[c]);
       if (i < exports.length - 1) {
         q += `, `;
       }
     }
 
-    const where = this.#whereSQL(query);
+    const where = MySQLClient.#whereSQL(query);
     q += where.q;
     v.push(...where.v);
 
     return [q, v];
   }
 
-  #deleteSQL(query) {
+  static #deleteSQL(query) {
     let q = ``;
     let v = [];
 
-    q += `DELETE FROM \`${this.#escape(query.table)}\``;
+    q += `DELETE FROM \`${MySQLClient.#escape(query.table)}\``;
 
-    const where = this.#whereSQL(query);
+    const where = MySQLClient.#whereSQL(query);
     q += where.q;
     v.push(...where.v);
 
     return [q, v];
   }
 
-  #whereSQL(query) {
+  static #whereSQL(query) {
     let q = ``;
     let v = [];
 
@@ -266,8 +228,7 @@ class MySQLClient {
       filter = filter.replace(
         /([a-zA-Z0-9\-\_]+) (=|==|:|::|<|>|<=|>=) ((?:['"`](?:\\['"`]|[^'"`])+['"`])|(?:\d+)|(?:true|false))/g,
         (m, m1, m2, m3) => {
-          console.log({ m1, m2, m3 });
-          m1 = `\`${this.#escape(m1)}\``;
+          m1 = `\`${MySQLClient.#escape(m1)}\``;
           m2 = m2.replace(/==/g, '=');
           m2 = m2.replace(/:|::/g, 'LIKE');
           if (m3.match(/['"`](\\['"`]|[^'"`])+['"`]/)) {
@@ -295,7 +256,9 @@ class MySQLClient {
         if (value instanceof Array) {
           q += ` (`;
           for (const [j, l] of value.entries()) {
-            q += ` \`${this.#escape(k)}\` ${query?.like ? `LIKE` : `=`} ?`;
+            q += ` \`${MySQLClient.#escape(k)}\` ${
+              query?.like ? `LIKE` : `=`
+            } ?`;
             v.push(l);
             if (j < value.length - 1) {
               q += ` OR`;
@@ -303,7 +266,7 @@ class MySQLClient {
           }
           q += ` )`;
         } else {
-          q += ` \`${this.#escape(k)}\` ${query?.like ? `LIKE` : `=`} ?`;
+          q += ` \`${MySQLClient.#escape(k)}\` ${query?.like ? `LIKE` : `=`} ?`;
           v.push(value);
         }
         if (i < keys.length - 1) {
@@ -342,10 +305,34 @@ class MySQLClient {
     this.#columnTypes[table] = parsers;
   }
 
-  #escape(v) {
+  static #escape(v) {
     return v.replace(/[^a-zA-Z0-9\-\_]/g, '');
   }
+
+  static SQLGen(query) {
+    const st = query?.statement?.toUpperCase();
+    switch (st) {
+      case 'INSERT': {
+        return MySQLClient.#insertSQL(query);
+      }
+      case 'SELECT': {
+        return MySQLClient.#selectSQL(query);
+      }
+      case 'UPDATE': {
+        return MySQLClient.#updateSQL(query);
+      }
+      case 'DELETE': {
+        return MySQLClient.#deleteSQL(query);
+      }
+      default: {
+        throw new Error('not support statement (' + st + ')');
+      }
+    }
+  }
 }
+
+const SQLGen = MySQLClient.SQLGen;
+export { SQLGen };
 
 let defaultClient = {};
 

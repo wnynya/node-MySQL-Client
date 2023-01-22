@@ -1,5 +1,7 @@
 import MySQLClient from '../src/index.mjs';
 
+import { SQLGen } from '../src/index.mjs';
+
 const db = new MySQLClient({
   host: '10.0.0.105',
   user: 'tester',
@@ -65,8 +67,6 @@ const oex = {
   // o.count => SELECT
   count: false,
 };
-
-console.log(db);
 
 async function test() {
   var t = new Date().getTime();
@@ -146,6 +146,22 @@ async function test2() {
   console.log('task end ' + (new Date().getTime() - t) + 'ms');
 }
 
+function test3() {
+  console.log(
+    SQLGen({
+      statement: 'INSERT',
+      table: 'example',
+      exports: {
+        uid: null,
+        hash: null,
+        name: null,
+        email: null,
+        creation: new Date(),
+      },
+    })
+  );
+}
+
 /*
 
 api/table
@@ -165,4 +181,5 @@ query {
 
  */
 
-test2();
+//test2();
+test3();
