@@ -1,17 +1,49 @@
 import MySQLClient from '../src/index.mjs';
+import { SQLGen, MySQLClass } from '../src/index.mjs';
 
-import { SQLGen } from '../src/index.mjs';
+const mysql = MySQLClient;
 
-const db = new MySQLClient({
+const client = new MySQLClient({
   host: '10.0.0.105',
   user: 'tester',
   password: '123456',
   database: 'test',
 });
-
-db.setColumnTypes('example', {
+client.setColumnTypes('example', {
   meta: 'json',
 });
+
+mysql.set(client);
+
+class Example extends MySQLClass {
+  constructor(uid) {
+    super(mysql);
+
+    this.uid = uid;
+    this.eid = '';
+    this.name = '';
+    this.creation = new Date();
+    this.meta = {};
+
+    this.table = 'example';
+    this.schema = {
+      uid: 'string',
+      eid: 'string',
+      name: 'string',
+      creation: 'date',
+      meta: (v) => {
+        return new Promise((resolve) => {
+          v = JSON.parse(v);
+          v.addon = 'message';
+          setTimeout(() => {
+            resolve(v);
+          }, 100);
+        });
+      },
+    };
+    this.filter = { uid: this.uid };
+  }
+}
 
 const oex = {
   statement: 'INSERT' || 'SELECT' || 'UPDATE' || 'DELETE',
@@ -124,7 +156,7 @@ async function test() {
 async function test2() {
   var t = new Date().getTime();
   console.log(
-    await db.query({
+    await mysql.query({
       statement: 'SELECT',
       table: 'example`',
       imports: ['uid`', 'eid', 'creation', 'meta'],
@@ -166,6 +198,17 @@ function test3() {
   );
 }
 
+async function test4() {
+  const e1 = new Example('uid-1674352583878');
+  const e2 = new Example('uid-1674352667786');
+
+  await e2.selectQuery('*');
+
+  console.log(e2.toSchemaObject());
+  console.log(e2.toSchemaJSON());
+}
+
+test4();
 /*
 
 api/table
@@ -184,6 +227,3 @@ query {
 }
 
  */
-
-//test2();
-test3();

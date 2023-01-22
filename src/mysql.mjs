@@ -398,26 +398,7 @@ class MySQLClient {
     }
   }
 }
+export default MySQLClient;
 
 const SQLGen = MySQLClient.SQLGen;
 export { SQLGen };
-
-let defaultClient = {};
-
-export default class {
-  constructor(config) {
-    return new MySQLClient(config);
-  }
-
-  static async query(query, values) {
-    return await defaultClient.query(query, values);
-  }
-
-  static set(client) {
-    defaultClient = client;
-  }
-
-  static get() {
-    return defaultClient;
-  }
-}
