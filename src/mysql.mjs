@@ -83,6 +83,9 @@ class MySQLClient {
               }
             }
             await Promise.all(tasks);
+            if (query?.single) {
+              res = res[0];
+            }
           } else {
             res = res[0][query.countColumn];
           }
