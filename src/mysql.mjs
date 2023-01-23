@@ -322,9 +322,7 @@ class MySQLClient {
     } else if (Number.isNaN(value)) {
       throw new Error('index ' + i + ' of values is not a number');
     } else if (value instanceof Date) {
-      value = value
-        .toJSON()
-        .replace(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})\.\d{3}Z$/, '$1 $2');
+      value = value.toJSON().slice(0, 19).replace('T', ' ');
     } else if (value instanceof Object) {
       try {
         value = JSON.stringify(value);

@@ -51,7 +51,11 @@ class MySQLClass {
 
     if (parts == '*') {
       for (const part in this.schema) {
-        imports[part] = this.schema[part];
+        if (this.schema[part] instanceof Array) {
+          imports[part] = this.schema[part][0];
+        } else {
+          imports[part] = this.schema[part];
+        }
       }
     } else if (parts instanceof Array) {
       for (const part of parts) {
@@ -74,7 +78,11 @@ class MySQLClass {
 
     if (parts == '*') {
       for (const part in this.schema) {
-        exports[part] = this[part];
+        if (this.schema[part] instanceof Array) {
+          exports[part] = this.schema[part][1](this[part]);
+        } else {
+          exports[part] = this[part];
+        }
       }
     } else if (parts instanceof Array) {
       for (const part of parts) {
