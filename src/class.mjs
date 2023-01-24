@@ -4,18 +4,26 @@ class MySQLClass {
   }
 
   async insertQuery(parts = '*') {
+    const exports = this.#getSchemaPartsExports(parts);
+    if (Object.keys(exports).length == 0) {
+      return;
+    }
     await this.mysql.query({
       statement: 'INSERT',
       table: this.table,
-      exports: this.#getSchemaPartsExports(parts),
+      exports: exports,
     });
   }
 
   async selectQuery(parts = '*') {
+    const imports = this.#getSchemaPartsImports(parts);
+    if (Object.keys(imports).length == 0) {
+      return;
+    }
     const data = await this.mysql.query({
       statement: 'SELECT',
       table: this.table,
-      imports: this.#getSchemaPartsImports(parts),
+      imports: imports,
       filter: this.filter,
       single: true,
     });
@@ -30,10 +38,14 @@ class MySQLClass {
   }
 
   async updateQuery(parts = []) {
+    const exports = this.#getSchemaPartsExports(parts);
+    if (Object.keys(exports).length == 0) {
+      return;
+    }
     await this.mysql.query({
       statement: 'UPDATE',
       table: this.table,
-      exports: this.#getSchemaPartsExports(parts),
+      exports: exports,
       filter: this.filter,
     });
   }

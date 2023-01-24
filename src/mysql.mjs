@@ -39,7 +39,11 @@ class MySQLClient {
       return JSON.parse(v);
     });
     this.setImportParser('date', (v) => {
-      return new Date(v);
+      let date = new Date(v);
+      if (Number.isNaN(date.getTime())) {
+        date = new Date(0);
+      }
+      return date;
     });
   }
 
