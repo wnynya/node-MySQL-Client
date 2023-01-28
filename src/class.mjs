@@ -29,7 +29,7 @@ class MySQLClass {
     });
 
     if (!data) {
-      throw new Error('No Data');
+      throw new Error('default404');
     }
 
     for (const key in data) {
@@ -128,7 +128,9 @@ class MySQLClass {
         if (value instanceof Date) {
           value = value.getTime();
         } else if (value instanceof Object) {
-          value = JSON.parse(JSON.stringify(value));
+          try {
+            value = JSON.parse(JSON.stringify(value));
+          } catch (error) {}
         } else {
           value = value + '';
         }
