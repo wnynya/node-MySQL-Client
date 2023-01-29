@@ -268,8 +268,8 @@ class MySQLClient {
           return m1 + ' ' + m2 + ' ?';
         }
       );
-      filter = filter.replace(/ && /g, 'AND');
-      filter = filter.replace(/ \|\| /g, 'OR');
+      filter = filter.replace(/ && /g, ' AND ');
+      filter = filter.replace(/ \|\| /g, ' OR ');
       q += filter;
       q += ` )`;
     } else if (filter instanceof Object) {
@@ -398,6 +398,10 @@ class MySQLClient {
     } else {
       return g;
     }
+  }
+
+  datetime(date) {
+    return new Date(date).toJSON().slice(0, 19).replace('T', ' ');
   }
 }
 export { MySQLClient };
